@@ -1,0 +1,12 @@
+- date: 26/8/2023
+  updates: 
+    - Set up the project
+- date : 28/8/2023
+  updates:
+    - Create Readme file
+    - Set up config files
+    - Create mongodb connection
+    - Create endpoint for getting all short urls
+    - Create endpoint for creating short urls
+  notes: 
+    - The code needs to be refactored to make it more modular and readable
