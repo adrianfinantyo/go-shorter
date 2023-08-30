@@ -9,6 +9,19 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+func GetClientData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		clientData := model.ClientData{
+			ClientIP: c.ClientIP(),
+			RequestOrigin: c.Request.Header.Get("Origin"),
+			Agent: c.Request.UserAgent(),
+		}
+
+		c.Set("clientData", clientData)
+		c.Next()
+	}
+}
+
 func ValidateRequestBody(requestModel interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestPointer := reflect.New(reflect.TypeOf(requestModel)).Interface()

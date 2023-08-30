@@ -6,12 +6,7 @@ type Config struct {
 	AppPrefix string `mapstructure:"APP_PREFIX"`
 	AppSecret string `mapstructure:"APP_SECRET"`
 	AppEnv string `mapstructure:"APP_ENV"`
-	MongoDBURI string
-	MongoDBHost string `mapstructure:"MONGODB_HOST"`
-	MongoDBPort string `mapstructure:"MONGODB_PORT"`
-	MongoDBName string `mapstructure:"MONGODB_NAME"`
-	MongoDBUser string `mapstructure:"MONGODB_USER"`
-	MongoDBPassword string `mapstructure:"MONGODB_PASS"`
+	MongoDBURI string `mapstructure:"MONGODB_URI"`
 	MongoDBRetry int `mapstructure:"MONGODB_RETRY"`
 	MongoDBRetryInterval int `mapstructure:"MONGODB_RETRY_INTERVAL"`
 }

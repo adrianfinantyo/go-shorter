@@ -17,3 +17,10 @@
     - Create redirect endpoint for redirecting to original url
   notes: 
     - Maybe db connection can call the collection directly instead of telling the db name
+- date : 30/8/2023
+  updates:
+    - Create endpoint for getting short url by id
+    - Create endpoint for deleting short url by id
+    - Create middleware to get client data from request
+  notes: 
+    - Consider to store the stats of the short url

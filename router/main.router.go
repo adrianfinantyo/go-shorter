@@ -18,12 +18,15 @@ func InitRouter(config *model.Config, db *mongo.Client) *gin.Engine {
 	shorterController := controller.NewShorterController(config, db)
 	
 	// Define the route
+	r.Use(middleware.GetClientData())
 	mainRouter := r.Group(config.AppPrefix)
 
 	// Main route handler
 	mainRouter.GET("/ping", mainController.Ping)
 	mainRouter.POST("/shorten", middleware.ValidateRequestBody(model.CreateShortLinkRequest{}), shorterController.CreateShortLink)
-	mainRouter.GET("/getAllLinks", shorterController.GetShortLink)
+	mainRouter.GET("/link", shorterController.GetAllShortLink)
+	mainRouter.GET("/link/:shortURL", shorterController.GetShortLink)
+	mainRouter.DELETE("/link/:shortURL", shorterController.DeleteShortLink)
 
 	r.GET("/:shortURL", shorterController.RedirectShortLink)
 

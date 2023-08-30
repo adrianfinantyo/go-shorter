@@ -19,8 +19,11 @@ func NewMainController(config *model.Config) *MainController {
 
 // Ping is a function to handle GET request at /ping endpoint
 func (controller *MainController) Ping(c *gin.Context) {
+	clientData := c.MustGet("clientData").(model.ClientData)
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 		"status": http.StatusOK,
+		"data": clientData,
 	})
 }

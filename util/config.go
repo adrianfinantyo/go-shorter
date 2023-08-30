@@ -34,12 +34,6 @@ func LoadConfig() *model.Config {
 		panic(err)
 	}
 
-	if config.MongoDBUser != "" && config.MongoDBPassword != "" {
-		config.MongoDBURI = fmt.Sprintf("mongodb://%s:%s@%s:%s/%s", config.MongoDBUser, config.MongoDBPassword, config.MongoDBHost, config.MongoDBPort, config.MongoDBName)
-	} else {
-		config.MongoDBURI = fmt.Sprintf("mongodb://%s:%s/%s", config.MongoDBHost, config.MongoDBPort, config.MongoDBName)
-	}
-
 	return &config
 }
 
