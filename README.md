@@ -64,9 +64,9 @@
 ## Contribution
 If you have any ideas or suggestions, feel free to open an issue or a pull request.🤝 I would be happy to hear your thoughts.
 
-<div style="text-align:center">
+<p align="center">
     <img width='250px' src='https://media.tenor.com/yNAtg-pEhfAAAAAd/azizi-asadel-azizi.gif' />
-</div>
+</p>
 
 ## License
 📜 This project is licensed under the [MIT License](LICENSE).
