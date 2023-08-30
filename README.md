@@ -1,9 +1,11 @@
 # 🔗 Go Shorter
-`This project involves creating a basic URL shortener using Go and Redis. The purpose is to convert lengthy URLs into shorter links, exploring key concepts of web development, API handling, and database management.`
+> This project involves creating a basic URL shortener using Go and Redis. The purpose is to convert lengthy URLs into shorter links, exploring key concepts of web development, API handling, and database management.
+
+**You can use this project to learn, explore, and implementing the technical concepts and best practices of web development using Go.**
 
 💡 This project `may not be the best way` to create a URL shortener. The `main idea` of this project is to learn and explore the concepts of web development, API handling, and database management using Go.
 
-🎯 The primary goal of this project is to assess and contrast the performance of the API under two conditions: with and without Redis caching.
+🎯 The primary goal of this project is to `assess and contrast the performance` of the API under two conditions: with and without Redis caching.
 
 💬 Feel free to open an issue or a pull request if you have any ideas or suggestions. [Contributions](#contribution) are always welcome.
 
@@ -64,9 +66,9 @@
 ## Contribution
 If you have any ideas or suggestions, feel free to open an issue or a pull request.🤝 I would be happy to hear your thoughts.
 
-<center>
+<div style="text-align:center">
     <img width='250px' src='https://media.tenor.com/yNAtg-pEhfAAAAAd/azizi-asadel-azizi.gif' />
-</center>
+</div>
 
 ## License
 📜 This project is licensed under the [MIT License](LICENSE).
