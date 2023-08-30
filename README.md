@@ -22,7 +22,7 @@
 - ❌ Create toggle to enable/disable the URL shortener
 - ❌ Create toggle to enable/disable caching in Redis
 
-`✅ : Completed | ❌ : Not Implemented | ⚒️ : In Progress`
+`✅: Completed | ❌: Not Implemented | ⚒️: In Progress`
 
 ## Technologies and Libraries
 - [`GO`](https://golang.org/) - Main programming language used to build the API
