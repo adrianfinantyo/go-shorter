@@ -2,6 +2,8 @@ package util
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,10 +34,16 @@ func LoadConfig() *model.Config {
 		panic(err)
 	}
 
+	if config.MongoDBUser != "" && config.MongoDBPassword != "" {
+		config.MongoDBURI = fmt.Sprintf("mongodb://%s:%s@%s:%s/%s", config.MongoDBUser, config.MongoDBPassword, config.MongoDBHost, config.MongoDBPort, config.MongoDBName)
+	} else {
+		config.MongoDBURI = fmt.Sprintf("mongodb://%s:%s/%s", config.MongoDBHost, config.MongoDBPort, config.MongoDBName)
+	}
+
 	return &config
 }
 
-func InitMongoDB(config *model.Config) *mongo.Client {
+func createMongoDBConnection(config *model.Config) *mongo.Client {
 	clientOptions := options.Client().ApplyURI(config.MongoDBURI)
 
 	conn, err := mongo.Connect(context.Background(), clientOptions)
@@ -43,4 +51,28 @@ func InitMongoDB(config *model.Config) *mongo.Client {
 		panic(err)
 	}
 	return conn
+}
+
+func InitMongoDB(config *model.Config) (*mongo.Client, error) {
+	var conn *mongo.Client
+	var err error
+	var maxRetry int = config.MongoDBRetry
+
+	for i := 0; i < maxRetry; i++ {
+		fmt.Printf("[%d] Create establish connection with MongoDB...\n", i+1)
+		conn = createMongoDBConnection(config)
+		err = conn.Ping(context.Background(), nil)
+		if err != nil {
+			fmt.Printf("Error connecting to MongoDB: %v\n", err)
+			if i < maxRetry-1 {
+				sleepDuration := time.Duration(config.MongoDBRetryInterval * i+1)
+				fmt.Printf("Retrying in %ds...\n", sleepDuration/time.Second)
+				time.Sleep(sleepDuration)
+			}
+		} else {
+			break
+		}
+	}
+
+	return conn, err
 }

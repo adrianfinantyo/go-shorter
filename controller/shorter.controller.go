@@ -6,7 +6,6 @@ import (
 
 	"adrianfinantyo.com/adrianfinantyo/go-shorter/model"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -14,11 +13,6 @@ import (
 type ShorterController struct{
 	config *model.Config
 	db *mongo.Client
-}
-
-type CreateShortLinkRequest struct {
-	OriginalURL string `json:"original_url" binding:"required"`
-	ShortURL string `json:"short_url" binding:"required"`
 }
 
 func NewShorterController(config *model.Config, db *mongo.Client) *ShorterController {
@@ -29,39 +23,13 @@ func NewShorterController(config *model.Config, db *mongo.Client) *ShorterContro
 }
 
 func (controller *ShorterController) CreateShortLink(c *gin.Context) {
-	var request CreateShortLinkRequest
-
-	if c.Request.ContentLength == 0 {
-		response := model.Response{
-			Status: http.StatusBadRequest,
-			Message: "Error, bad request",
-			Data: nil,
-		}
-		c.JSON(http.StatusBadRequest, response)
-	 }
-
-	validationErr := c.ShouldBindJSON(&request)
-	if validationErr != nil {
-		var validationErrors []string
-		for _, err := range validationErr.(validator.ValidationErrors) {
-			validationErrors = append(validationErrors, err.Tag() + " " + err.Field())
-		}
-
-		response := model.Response{
-			Status: http.StatusBadRequest,
-			Message: "Error, bad request",
-			Data: validationErrors,
-		}
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
 	collection := controller.db.Database("go-shorter").Collection("links")
 	
 	// find the link in the database
+	request := c.MustGet("request").(*model.CreateShortLinkRequest)
 	result := bson.M{}
 	findErr := collection.FindOne(context.Background(), bson.M{
-		"short_url": "google",
+		"short_url": request.ShortURL,
 	}).Decode(&result)
 	if findErr == nil {
 		response := model.Response{
@@ -74,8 +42,8 @@ func (controller *ShorterController) CreateShortLink(c *gin.Context) {
 	}
 
 	_, insertErr := collection.InsertOne(context.Background(), bson.M{
-		"original_url": "https://www.google.com",
-		"short_url": "google",
+		"original_url": request.OriginalURL,
+		"short_url": request.ShortURL,
 	})
 	if insertErr != nil {
 		panic(insertErr)
@@ -109,4 +77,26 @@ func (controller *ShorterController) GetShortLink(c *gin.Context) {
 		Data: data,
 	}
 	c.JSON(http.StatusOK, response)
+}
+
+func (controller *ShorterController) RedirectShortLink(c *gin.Context) {
+	collection := controller.db.Database("go-shorter").Collection("links")
+
+	shortURL := c.Param("shortURL")
+	result := bson.M{}
+	findErr := collection.FindOne(context.Background(), bson.M{
+		"short_url": shortURL,
+	}).Decode(&result)
+	if findErr != nil {
+		response := model.Response{
+			Status: http.StatusNotFound,
+			Message: "Error, short link not found",
+			Data: nil,
+		}
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
+	originalURL := result["original_url"].(string)
+	c.Redirect(http.StatusMovedPermanently, originalURL)
 }

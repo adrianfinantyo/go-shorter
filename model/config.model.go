@@ -6,12 +6,14 @@ type Config struct {
 	AppPrefix string `mapstructure:"APP_PREFIX"`
 	AppSecret string `mapstructure:"APP_SECRET"`
 	AppEnv string `mapstructure:"APP_ENV"`
-	DBHost string `mapstructure:"DB_HOST"`
-	DBPort string `mapstructure:"DB_PORT"`
-	DBUser string `mapstructure:"DB_USER"`
-	DBPassword string `mapstructure:"DB_PASSWORD"`
-	DBName string `mapstructure:"DB_NAME"`
-	MongoDBURI string `mapstructure:"MONGODB_URI"`
+	MongoDBURI string
+	MongoDBHost string `mapstructure:"MONGODB_HOST"`
+	MongoDBPort string `mapstructure:"MONGODB_PORT"`
+	MongoDBName string `mapstructure:"MONGODB_NAME"`
+	MongoDBUser string `mapstructure:"MONGODB_USER"`
+	MongoDBPassword string `mapstructure:"MONGODB_PASS"`
+	MongoDBRetry int `mapstructure:"MONGODB_RETRY"`
+	MongoDBRetryInterval int `mapstructure:"MONGODB_RETRY_INTERVAL"`
 }
 
 type Response struct {

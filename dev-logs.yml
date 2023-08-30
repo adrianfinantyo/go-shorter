@@ -1,6 +1,7 @@
 - date: 26/8/2023
   updates: 
     - Set up the project
+  notes :
 - date : 28/8/2023
   updates:
     - Create Readme file
@@ -10,3 +11,9 @@
     - Create endpoint for creating short urls
   notes: 
     - The code needs to be refactored to make it more modular and readable
+- date : 29/8/2023
+  updates:
+    - Create middleware for validating request body
+    - Create redirect endpoint for redirecting to original url
+  notes: 
+    - Maybe db connection can call the collection directly instead of telling the db name

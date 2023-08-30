@@ -2,6 +2,7 @@ package router
 
 import (
 	"adrianfinantyo.com/adrianfinantyo/go-shorter/controller"
+	"adrianfinantyo.com/adrianfinantyo/go-shorter/middleware"
 	"adrianfinantyo.com/adrianfinantyo/go-shorter/model"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,12 +19,13 @@ func InitRouter(config *model.Config, db *mongo.Client) *gin.Engine {
 	
 	// Define the route
 	mainRouter := r.Group(config.AppPrefix)
-	
 
 	// Main route handler
 	mainRouter.GET("/ping", mainController.Ping)
-	mainRouter.POST("/shorten", shorterController.CreateShortLink)
+	mainRouter.POST("/shorten", middleware.ValidateRequestBody(model.CreateShortLinkRequest{}), shorterController.CreateShortLink)
 	mainRouter.GET("/getAllLinks", shorterController.GetShortLink)
+
+	r.GET("/:shortURL", shorterController.RedirectShortLink)
 
 	return r
 }
