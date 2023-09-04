@@ -59,14 +59,18 @@
 | `util` | Contains the utilities of the API |
 
 ## System Architecture
-`Will be added soon`
+This is a simple system architecture of the whole project that display the communication between the components. The API is the main component of the system. It communicates with the MongoDB database to store and retrieve the shortened URLs. It also communicates with the Redis database to cache the shortened URLs. The API is also responsible to redirect the user to the original URL when the user requests the shortened URL. The API also communicates with the web interface to display the shortened URLs information.
+
+<div align="center">
+<img width="80%" src=".github/assets/sys-arch.png" />
+</div>
 
 ## Contribution
 If you have any ideas or suggestions, feel free to open an issue or a pull request.🤝 I would be happy to hear your thoughts.
 
-<center>
-    <img width='250px' src='https://media.tenor.com/yNAtg-pEhfAAAAAd/azizi-asadel-azizi.gif' />
-</center>
+<div align="center">
+    <img width='60%' src='https://media.tenor.com/yNAtg-pEhfAAAAAd/azizi-asadel-azizi.gif' />
+</div>
 
 ## License
 📜 This project is licensed under the [MIT License](LICENSE).
