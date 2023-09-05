@@ -62,7 +62,7 @@
 This is a simple system architecture of the whole project that display the communication between the components. The API is the main component of the system. It communicates with the MongoDB database to store and retrieve the shortened URLs. It also communicates with the Redis database to cache the shortened URLs. The API is also responsible to redirect the user to the original URL when the user requests the shortened URL. The API also communicates with the web interface to display the shortened URLs information.
 
 <div align="center">
-<img width="80%" src=".github/assets/sys-arch.png" />
+    <img width="80%" src="./.github/assets/sys-arch.png" />
 </div>
 
 ## Contribution
