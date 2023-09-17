@@ -2,9 +2,12 @@ package util
 
 import (
 	"context"
-	"fmt"
+	"os"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,30 +40,22 @@ func LoadConfig() *model.Config {
 	return &config
 }
 
-func createMongoDBConnection(config *model.Config) *mongo.Client {
-	clientOptions := options.Client().ApplyURI(config.MongoDBURI)
-
-	conn, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		panic(err)
-	}
-	return conn
-}
-
-func InitMongoDB(config *model.Config) (*mongo.Client, error) {
+func createMongoDBInstance(config *model.Config) (*mongo.Client, error) {
 	var conn *mongo.Client
 	var err error
 	var maxRetry int = config.MongoDBRetry
+	clientOptions := options.Client().ApplyURI(config.MongoDBURI)
 
-	for i := 0; i < maxRetry; i++ {
-		fmt.Printf("[%d] Create establish connection with MongoDB...\n", i+1)
-		conn = createMongoDBConnection(config)
+	for i := 0; i <= maxRetry; i++ {
+		log.Info("Create establish connection with MongoDB...")
+		conn, _ = mongo.Connect(context.Background(), clientOptions)
 		err = conn.Ping(context.Background(), nil)
 		if err != nil {
-			fmt.Printf("Error connecting to MongoDB: %v\n", err)
+			log.Error(err)
 			if i < maxRetry-1 {
-				sleepDuration := time.Duration(config.MongoDBRetryInterval * i+1)
-				fmt.Printf("Retrying in %ds...\n", sleepDuration/time.Second)
+				sleepDuration := time.Duration(config.MongoDBRetryInterval * (i+1)) * time.Millisecond
+				log.Warnf("Retrying in %ds...\n", sleepDuration/time.Second)
+				os.Stdout.Sync()
 				time.Sleep(sleepDuration)
 			}
 		} else {
@@ -69,4 +64,47 @@ func InitMongoDB(config *model.Config) (*mongo.Client, error) {
 	}
 
 	return conn, err
+}
+
+func createRedisInstance(config *model.Config) (*redis.Client, error) {
+	var conn *redis.Client
+	var err error
+	redisOptions := &redis.Options{
+		Addr: config.RedisHost + ":" + config.RedisPort,
+		Password: config.RedisPassword,
+		DB: 0,
+	}
+
+	log.Info("Create establish connection with Redis...")
+	conn = redis.NewClient(redisOptions)
+	_, err = conn.Ping(context.Background()).Result()
+	if err != nil {
+		log.Error(err)
+	}
+
+	return conn, err
+}
+
+func InitDBConnection(config *model.Config) * model.DatabaseConnection {
+	var dbConn model.DatabaseConnection
+	var err error
+
+	dbConn.MongoDB, err = createMongoDBInstance(config)
+	if err != nil {
+		log.Error(err)
+		panic("Failed to connect to MongoDB")
+	}
+
+	dbConn.Redis, err = createRedisInstance(config)
+	if err != nil {
+		log.Error(err)
+		panic("Failed to connect to Redis")
+	}
+
+	return &dbConn
+}
+
+func RunOnExit(dbConn *model.DatabaseConnection) {
+	dbConn.MongoDB.Disconnect(context.Background())
+	dbConn.Redis.Close()
 }

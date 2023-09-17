@@ -1,8 +1,14 @@
 package middleware
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"reflect"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+	log "github.com/sirupsen/logrus"
 
 	"adrianfinantyo.com/adrianfinantyo/go-shorter/model"
 	"github.com/gin-gonic/gin"
@@ -65,5 +71,45 @@ func ValidateRequestBody(requestModel interface{}) gin.HandlerFunc {
 		// Proceed with the next handler
 		c.Set("request", requestPointer)
 		c.Next()
+	}
+}
+
+func GetCacheStatus(config *model.Config, conn *model.DatabaseConnection) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cacheKey := fmt.Sprintf("%s:status", config.CacheKeyPrefix)
+		cacheStatus, err := conn.Redis.Get(context.Background(), cacheKey).Result()
+		if err != nil {
+			log.Error(err)
+		}
+
+		if err == redis.Nil {
+			cacheStatus = "on"
+			conn.Redis.Set(context.Background(), cacheKey, cacheStatus, 0)
+		}
+
+		c.Set("cacheStatus", cacheStatus)
+		c.Next()
+	}
+}
+
+func RequestLogs() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		c.Next()
+
+		end := time.Now()
+        latency := end.Sub(start)
+        clientIP := c.ClientIP()
+        status := c.Writer.Status()
+        method := c.Request.Method
+        path := c.Request.URL.Path
+
+        log.WithFields(log.Fields{
+            "status":     status,
+            "latency":    latency,
+            "clientIP":   clientIP,
+            "method":     method,
+            "path":       path,
+        }).Info("Request details")
 	}
 }

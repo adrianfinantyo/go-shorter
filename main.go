@@ -1,36 +1,52 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
+	log "github.com/sirupsen/logrus"
+
+	"adrianfinantyo.com/adrianfinantyo/go-shorter/model"
 	"adrianfinantyo.com/adrianfinantyo/go-shorter/router"
 	"adrianfinantyo.com/adrianfinantyo/go-shorter/util"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func main() {
 	config := util.LoadConfig()
-	db, err := util.InitMongoDB(config)
-	if err != nil {
-		panic("Cannot connect to MongoDB")
-	}
+	dbConn := util.InitDBConnection(config)
 
-	defer runOnExit(db)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	
+	// Handle system interrupt
+	channel := make(chan os.Signal, 1)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
+	go systemInterruptHandler(channel, dbConn)
 
-	routes := router.InitRouter(config, db)
+	// Run on exit
+	defer runOnExit(dbConn)
 
+	// Initialize router and server
+	routes := router.InitRouter(config, dbConn)
 	server := &http.Server{
 		Addr: config.AppHost + ":" + config.AppPort,
 		Handler: routes,
 	}
+
 	server.ListenAndServe()
 }
 
-func runOnExit(db *mongo.Client) {
-	err := db.Disconnect(context.Background())
-	if err != nil {
-		fmt.Printf("Error disconnecting from MongoDB: %v\n", err)
-	}
+func systemInterruptHandler(channel chan os.Signal, dbConn *model.DatabaseConnection) {
+	<-channel
+	fmt.Println("Interrupt signal received.")
+	runOnExit(dbConn)
+	os.Exit(0)
+}
+
+func runOnExit(dbConn *model.DatabaseConnection) {
+	util.RunOnExit(dbConn)
+	fmt.Println("Server is shutting down...")
 }
