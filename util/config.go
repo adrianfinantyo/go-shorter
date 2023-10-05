@@ -28,7 +28,7 @@ func LoadConfig() *model.Config {
 
 	// Set default value
 	viper.SetDefault("APP_PORT", "8080")
-	viper.SetDefault("APP_HOST", "localhost")
+	viper.SetDefault("APP_HOST", "0.0.0.0")
 
 	// Bind config to struct
 	var config model.Config
@@ -53,7 +53,7 @@ func createMongoDBInstance(config *model.Config) (*mongo.Client, error) {
 		if err != nil {
 			log.Error(err)
 			if i < maxRetry-1 {
-				sleepDuration := time.Duration(config.MongoDBRetryInterval * (i+1)) * time.Millisecond
+				sleepDuration := time.Duration(config.MongoDBRetryInterval*(i+1)) * time.Millisecond
 				log.Warnf("Retrying in %ds...\n", sleepDuration/time.Second)
 				os.Stdout.Sync()
 				time.Sleep(sleepDuration)
@@ -70,9 +70,9 @@ func createRedisInstance(config *model.Config) (*redis.Client, error) {
 	var conn *redis.Client
 	var err error
 	redisOptions := &redis.Options{
-		Addr: config.RedisHost + ":" + config.RedisPort,
+		Addr:     config.RedisHost + ":" + config.RedisPort,
 		Password: config.RedisPassword,
-		DB: 0,
+		DB:       0,
 	}
 
 	log.Info("Create establish connection with Redis...")
@@ -85,7 +85,7 @@ func createRedisInstance(config *model.Config) (*redis.Client, error) {
 	return conn, err
 }
 
-func InitDBConnection(config *model.Config) * model.DatabaseConnection {
+func InitDBConnection(config *model.Config) *model.DatabaseConnection {
 	var dbConn model.DatabaseConnection
 	var err error
 

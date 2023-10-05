@@ -61,6 +61,9 @@
 ## System Architecture
 `Will be added soon`
 
+## Run with Docker
+```docker compose up -d```
+
 ## Contribution
 If you have any ideas or suggestions, feel free to open an issue or a pull request.🤝 I would be happy to hear your thoughts.
 
