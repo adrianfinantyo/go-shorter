@@ -29,6 +29,7 @@ func LoadConfig() *model.Config {
 	// Set default value
 	viper.SetDefault("APP_PORT", "8080")
 	viper.SetDefault("APP_HOST", "localhost")
+	//viper.SetDefault("APP_HOST", "0.0.0.0") // use when using docker
 
 	// Bind config to struct
 	var config model.Config
@@ -70,9 +71,9 @@ func createRedisInstance(config *model.Config) (*redis.Client, error) {
 	var conn *redis.Client
 	var err error
 	redisOptions := &redis.Options{
-		Addr: config.RedisHost + ":" + config.RedisPort,
+		Addr:     config.RedisHost + ":" + config.RedisPort,
 		Password: config.RedisPassword,
-		DB: 0,
+		DB:       0,
 	}
 
 	log.Info("Create establish connection with Redis...")
@@ -85,7 +86,7 @@ func createRedisInstance(config *model.Config) (*redis.Client, error) {
 	return conn, err
 }
 
-func InitDBConnection(config *model.Config) * model.DatabaseConnection {
+func InitDBConnection(config *model.Config) *model.DatabaseConnection {
 	var dbConn model.DatabaseConnection
 	var err error
 
