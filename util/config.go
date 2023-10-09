@@ -28,7 +28,8 @@ func LoadConfig() *model.Config {
 
 	// Set default value
 	viper.SetDefault("APP_PORT", "8080")
-	viper.SetDefault("APP_HOST", "0.0.0.0")
+	viper.SetDefault("APP_HOST", "localhost")
+	//viper.SetDefault("APP_HOST", "0.0.0.0") // use when using docker
 
 	// Bind config to struct
 	var config model.Config
@@ -53,7 +54,7 @@ func createMongoDBInstance(config *model.Config) (*mongo.Client, error) {
 		if err != nil {
 			log.Error(err)
 			if i < maxRetry-1 {
-				sleepDuration := time.Duration(config.MongoDBRetryInterval*(i+1)) * time.Millisecond
+				sleepDuration := time.Duration(config.MongoDBRetryInterval * (i+1)) * time.Millisecond
 				log.Warnf("Retrying in %ds...\n", sleepDuration/time.Second)
 				os.Stdout.Sync()
 				time.Sleep(sleepDuration)
